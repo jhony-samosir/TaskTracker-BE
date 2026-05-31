@@ -27,7 +27,7 @@ public partial class TrxTask
 
     public int ReviewerUserId { get; set; }
 
-    public DateOnly DeadlineDate { get; set; }
+    public DateTime DeadlineDate { get; set; }
 
     public int TaskStatusId { get; set; }
 }

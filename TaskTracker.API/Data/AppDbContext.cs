@@ -20,6 +20,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<MstUser> MstUsers { get; set; }
 
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
     public virtual DbSet<TrxTask> TrxTasks { get; set; }
 
     public virtual DbSet<TrxTaskComment> TrxTaskComments { get; set; }
@@ -29,8 +31,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<TrxTaskHistory> TrxTaskHistories { get; set; }
 
     public virtual DbSet<TrxUserRole> TrxUserRoles { get; set; }
-
-    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,14 +46,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.FileBase64).HasColumnName("file_base64");
             entity.Property(e => e.FileName)
                 .HasMaxLength(255)
@@ -65,9 +62,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
         });
 
         modelBuilder.Entity<MstRole>(entity =>
@@ -82,14 +77,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.RoleDescription)
                 .HasMaxLength(255)
                 .HasColumnName("role_description");
@@ -99,9 +91,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
         });
 
         modelBuilder.Entity<MstTaskStatus>(entity =>
@@ -116,14 +106,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.StatusDescription)
                 .HasMaxLength(255)
                 .HasColumnName("status_description");
@@ -133,9 +120,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
         });
 
         modelBuilder.Entity<MstUser>(entity =>
@@ -152,14 +137,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
                 .HasColumnName("email");
@@ -170,9 +152,34 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.RefreshTokenId).HasName("refresh_token_pkey");
+
+            entity.ToTable("refresh_token");
+
+            entity.HasIndex(e => e.TokenHash, "ix_refresh_token_token_hash").IsUnique();
+
+            entity.Property(e => e.RefreshTokenId).HasColumnName("refresh_token_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(e => e.ReplacedByTokenHash)
+                .HasMaxLength(128)
+                .HasColumnName("replaced_by_token_hash");
+            entity.Property(e => e.RevokedAt).HasColumnName("revoked_at");
+            entity.Property(e => e.TokenHash)
+                .HasMaxLength(128)
+                .HasColumnName("token_hash");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.RefreshTokens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("refresh_token_user_id_fkey");
         });
 
         modelBuilder.Entity<TrxTask>(entity =>
@@ -188,15 +195,12 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeadlineDate).HasColumnName("deadline_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.ReviewerUserId).HasColumnName("reviewer_user_id");
             entity.Property(e => e.TaskDescription).HasColumnName("task_description");
             entity.Property(e => e.TaskStatusId).HasColumnName("task_status_id");
@@ -206,9 +210,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
         });
 
         modelBuilder.Entity<TrxTaskComment>(entity =>
@@ -224,22 +226,17 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.ReviewerUserId).HasColumnName("reviewer_user_id");
             entity.Property(e => e.TaskId).HasColumnName("task_id");
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
         });
 
         modelBuilder.Entity<TrxTaskDocument>(entity =>
@@ -254,14 +251,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.DocumentId).HasColumnName("document_id");
             entity.Property(e => e.DocumentType)
                 .HasMaxLength(50)
@@ -273,9 +267,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
         });
 
         modelBuilder.Entity<TrxTaskHistory>(entity =>
@@ -293,14 +285,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.NewTaskStatusId).HasColumnName("new_task_status_id");
             entity.Property(e => e.OldTaskStatusId).HasColumnName("old_task_status_id");
             entity.Property(e => e.Remarks).HasColumnName("remarks");
@@ -308,43 +297,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
-        });
-
-        modelBuilder.Entity<RefreshToken>(entity =>
-        {
-            entity.HasKey(e => e.RefreshTokenId).HasName("refresh_token_pkey");
-
-            entity.ToTable("refresh_token");
-
-            entity.Property(e => e.RefreshTokenId).HasColumnName("refresh_token_id");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.TokenHash)
-                .HasMaxLength(128)
-                .HasColumnName("token_hash");
-            entity.Property(e => e.ExpiresAt)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("expires_at");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("created_at");
-            entity.Property(e => e.RevokedAt)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("revoked_at");
-            entity.Property(e => e.ReplacedByTokenHash)
-                .HasMaxLength(128)
-                .HasColumnName("replaced_by_token_hash");
-
-            entity.HasOne(d => d.User)
-                .WithMany()
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("refresh_token_user_id_fkey");
-
-            entity.HasIndex(e => e.TokenHash, "ix_refresh_token_token_hash");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
         });
 
         modelBuilder.Entity<TrxUserRole>(entity =>
@@ -359,21 +312,16 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_by");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_date");
             entity.Property(e => e.DeletedBy)
                 .HasMaxLength(100)
                 .HasColumnName("deleted_by");
-            entity.Property(e => e.DeletedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_date");
+            entity.Property(e => e.DeletedDate).HasColumnName("deleted_date");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(100)
                 .HasColumnName("updated_by");
-            entity.Property(e => e.UpdatedDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_date");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
             entity.Property(e => e.UserId).HasColumnName("user_id");
         });
 

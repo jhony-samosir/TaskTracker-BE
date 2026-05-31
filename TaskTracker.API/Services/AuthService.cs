@@ -25,7 +25,7 @@ public sealed class AuthService(
             throw new InvalidOperationException("User with this email already exists.");
 
         var role = await dbContext.MstRoles
-            .FirstOrDefaultAsync(r => r.RoleName == request.Role && r.DeletedDate == null, cancellationToken);
+            .FirstOrDefaultAsync(r => r.RoleName.ToLower() == request.Role.ToLower() && r.DeletedDate == null, cancellationToken);
 
         if (role is null)
         {
@@ -54,7 +54,7 @@ public sealed class AuthService(
         var userRole = new TrxUserRole
         {
             UserId = user.UserId,
-            RoleId = role.RoleId,
+            RoleId = role.RoleId, //Default employee
             CreatedDate = DateTime.UtcNow,
             CreatedBy = "System"
         };

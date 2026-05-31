@@ -24,4 +24,6 @@ public partial class MstUser
     public string Email { get; set; } = null!;
 
     public string PasswordHash { get; set; } = null!;
+
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }
