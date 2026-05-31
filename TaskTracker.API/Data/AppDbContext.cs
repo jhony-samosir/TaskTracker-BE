@@ -30,6 +30,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<TrxUserRole> TrxUserRoles { get; set; }
 
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<MstDocument>(entity =>
@@ -309,6 +311,40 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("updated_date");
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.RefreshTokenId).HasName("refresh_token_pkey");
+
+            entity.ToTable("refresh_token");
+
+            entity.Property(e => e.RefreshTokenId).HasColumnName("refresh_token_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.TokenHash)
+                .HasMaxLength(128)
+                .HasColumnName("token_hash");
+            entity.Property(e => e.ExpiresAt)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("expires_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.RevokedAt)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("revoked_at");
+            entity.Property(e => e.ReplacedByTokenHash)
+                .HasMaxLength(128)
+                .HasColumnName("replaced_by_token_hash");
+
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("refresh_token_user_id_fkey");
+
+            entity.HasIndex(e => e.TokenHash, "ix_refresh_token_token_hash");
         });
 
         modelBuilder.Entity<TrxUserRole>(entity =>

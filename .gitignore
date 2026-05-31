@@ -21,3 +21,8 @@ packages/
 
 # Test results
 TestResults/
+
+# Configuration files containing secrets
+appsettings.Development.json
+appsettings.Local.json
+*.secrets.json
