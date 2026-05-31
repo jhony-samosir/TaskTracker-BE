@@ -63,6 +63,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IMyTaskService, MyTaskService>();
 builder.Services.AddScoped<IPasswordHasher<MstUser>, PasswordHasher<MstUser>>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddFluentValidationAutoValidation();
