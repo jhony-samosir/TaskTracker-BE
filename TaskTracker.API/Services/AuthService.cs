@@ -191,6 +191,28 @@ public sealed class AuthService(
         return new UserProfileResponse(user.UserId, user.FullName, user.Email, roleName);
     }
 
+    public async Task<IEnumerable<UserDropdownResponse>> GetUsersAsync(CancellationToken cancellationToken)
+    {
+        var users = await (
+            from user in dbContext.MstUsers
+            where user.DeletedDate == null
+            join userRole in dbContext.TrxUserRoles.Where(ur => ur.DeletedDate == null)
+                on user.UserId equals userRole.UserId into userRoles
+            from userRole in userRoles.DefaultIfEmpty()
+            join role in dbContext.MstRoles.Where(r => r.DeletedDate == null)
+                on userRole.RoleId equals role.RoleId into roles
+            from role in roles.DefaultIfEmpty()
+            orderby user.FullName
+            select new UserDropdownResponse(
+                user.UserId,
+                user.FullName,
+                user.Email,
+                role != null ? role.RoleName : "User"))
+            .ToListAsync(cancellationToken);
+
+        return users;
+    }
+
     public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request, CancellationToken cancellationToken)
     {
         var user = await dbContext.MstUsers

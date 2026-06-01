@@ -9,5 +9,6 @@ public interface IAuthService
     Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken);
     Task LogoutAsync(LogoutRequest request, int userId, CancellationToken cancellationToken);
     Task<UserProfileResponse> GetCurrentUserAsync(int userId, CancellationToken cancellationToken);
+    Task<IEnumerable<UserDropdownResponse>> GetUsersAsync(CancellationToken cancellationToken);
     Task ChangePasswordAsync(int userId, ChangePasswordRequest request, CancellationToken cancellationToken);
 }

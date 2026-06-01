@@ -58,6 +58,14 @@ public sealed class AuthController(IAuthService authService) : ControllerBase
         return Ok(ApiResponse<UserProfileResponse>.Success(response));
     }
 
+    [HttpGet("listuser")]
+    [Authorize]
+    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
+    {
+        var response = await authService.GetUsersAsync(cancellationToken);
+        return Ok(ApiResponse<IEnumerable<UserDropdownResponse>>.Success(response, "Users retrieved successfully."));
+    }
+
     [HttpPost("change-password")]
     [Authorize]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request, CancellationToken cancellationToken)

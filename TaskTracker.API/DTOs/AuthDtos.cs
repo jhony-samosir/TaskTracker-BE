@@ -7,6 +7,7 @@ public sealed record LogoutRequest(string RefreshToken);
 public sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword);
 public sealed record AuthResponse(string AccessToken, string RefreshToken, DateTime AccessTokenExpiresAt, UserProfileResponse User);
 public sealed record UserProfileResponse(int UserId, string FullName, string Email, string Role);
+public sealed record UserDropdownResponse(int UserId, string FullName, string Email, string Role);
 public sealed record ApiResponse<T>(bool Succeeded, string Message, T? Data = default, IReadOnlyList<string>? Errors = null)
 {
     public static ApiResponse<T> Success(T data, string message = "Success") => new(true, message, data);
